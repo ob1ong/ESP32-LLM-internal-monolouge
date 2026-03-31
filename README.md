@@ -99,9 +99,6 @@ Make sure these files are in the same folder:
 In Arduino IDE:
 
 - Go to **Preferences**
-- Add:
-
-    https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
 
 Then:
 
