@@ -30,61 +30,57 @@ Expected URLs:
 
 ---
 
-## ESP32
+## Running the mobile app
 
-The ESP32 sketch:
-
-- connects to Wi-Fi
-- serves the camera web server
-- exposes `/capture`
-- exposes `:82/sleep`
-- enters deep sleep until BOOT is pressed
-
----
-
-## 📱 Running the mobile app
-
-    cd mobile-app
-    npm install
-    npx expo install expo-speech
-    npx expo start
+cd mobile-app
+npm install
+npx expo install expo-speech
+npx expo start
 
 Then:
 
-- Open **Expo Go**
+- Open Expo Go
 - Scan the QR code
 
 ---
 
-## 📁 Expo project structure
+## Expo project structure
 
-    mobile-app/
-    └── app/
-        ├── _layout.tsx
-        └── index.tsx
+Put your main app screen here:
 
-- `_layout.tsx` → required root layout
-- `index.tsx` → main app screen
+mobile-app/
+└── app/
+    └── index.tsx
+
+Important:
+
+- Put `index.tsx` inside the `app/` folder
+- Do not leave `index.tsx` in the project root
+- Expo Router expects the screen file to be inside `app/`
+
+If you are also using a layout file, it should also go inside the same `app/` folder.
 
 ---
 
-## ⚙️ App configuration
+## App configuration
 
 Enter the following in the app UI:
 
-    OpenAI API Key: sk-...
-    Photo URL: http://<esp32-ip>/capture
-    Sleep URL: http://<esp32-ip>:82/sleep
+OpenAI API Key: sk-...
+Photo URL: http://<esp32-ip>/capture
+Sleep URL: http://<esp32-ip>:82/sleep
 
 ---
 
-## 🔧 ESP32 Setup (XIAO ESP32S3 Sense)
+## ESP32 Setup (XIAO ESP32S3 Sense)
 
-### 1. Open the project
+### 1. Open the Arduino project
 
-    esp32-camera/ESP32-XIAO-monologue.ino
+Open:
 
-Make sure these files are in the same folder:
+esp32-camera/ESP32-XIAO-monologue.ino
+
+Make sure these files are in the same folder as the `.ino` file:
 
 - `app_httpd.cpp`
 - `camera_index.h`
@@ -94,100 +90,108 @@ Make sure these files are in the same folder:
 
 ---
 
-### 2. Install ESP32 support
+### 2. Install ESP32 board support
 
 In Arduino IDE:
 
-- Go to **Preferences**
-
-Then:
-
-- Open **Boards Manager**
-- Install **ESP32 by Espressif Systems**
+- Go to File → Preferences
+- Open Tools → Board → Boards Manager
+- Search for ESP32
+- Install ESP32 by Espressif Systems
 
 ---
 
-### 3. Board settings
+### 3. Arduino IDE settings
 
-    Board: ESP32S3 Dev Module
-    PSRAM: Enabled
-    Flash Mode: QIO
-    Partition Scheme: Huge APP
+Set these before uploading:
+
+Board: ESP32S3 Dev Module
+Upload Speed: 921600
+USB Mode: Hardware CDC and JTAG
+USB CDC On Boot: Enabled
+USB Firmware MSC On Boot: Disabled
+USB DFU On Boot: Disabled
+CPU Frequency: 240MHz (WiFi)
+Flash Mode: QIO 80MHz
+Flash Size: 8MB
+Partition Scheme: Huge APP
+PSRAM: OPI PSRAM
+Core Debug Level: None
+Erase All Flash Before Sketch Upload: Disabled
+JTAG Adapter: Disabled
+Events Run On: Core 1
+Arduino Runs On: Core 1
+
+If your Arduino IDE shows slightly different names, choose the closest matching option.
 
 ---
 
-### 4. Configure WiFi
+### 4. Configure Wi-Fi in the Arduino code
 
-Edit in `.ino` file:
+Edit this in the `.ino` file:
 
-    const char *ssid = "YOUR_WIFI";
-    const char *password = "YOUR_PASSWORD";
+const char *ssid = "YOUR_WIFI";
+const char *password = "YOUR_PASSWORD";
 
 ---
 
 ### 5. Upload
 
-- Select correct port
-- Upload sketch
+- Select the correct port
+- Connect the board by USB
+- Click Upload
+
+If upload fails, try holding the BOOT button as upload starts.
 
 ---
 
 ### 6. Get device URLs
 
-Open Serial Monitor (115200 baud)
+Open Serial Monitor at:
 
-You will see:
+115200 baud
 
-    Camera Ready! Use 'http://192.168.x.x' to connect
+You should see:
+
+Camera Ready! Use 'http://192.168.x.x' to connect
 
 Use:
 
-    Photo URL: http://<ip>/capture
-    Sleep URL: http://<ip>:82/sleep
+Photo URL: http://<ip>/capture
+Sleep URL: http://<ip>:82/sleep
 
 ---
 
-## 🔁 System flow
+## System flow
 
-    ESP32 Camera → Mobile App → OpenAI → Speech Output
+ESP32 Camera → Mobile App → OpenAI → Speech Output
 
-1. ESP32 captures image  
-2. App fetches `/capture`  
-3. App sends image + prompt to OpenAI  
-4. Response is spoken aloud  
-5. Next request is preloaded while speaking  
-
----
-
-## ⚠️ Troubleshooting
-
-### ESP32
-
-- `Camera init failed 0x106` → wrong camera config  
-- No image → open `/capture` in browser  
-
-### Expo
-
-- “Failed to download update” → switch Expo to **Tunnel**  
-- App crashes → run `npm install`  
+1. ESP32 captures image
+2. App fetches /capture
+3. App sends image + prompt to OpenAI
+4. Response is spoken aloud
+5. App can send /sleep when needed
 
 ---
 
-## 🧠 Notes
+## Troubleshooting
 
-- Sleep endpoint:
+ESP32
 
-    http://<ip>:82/sleep
+- Camera init failed 0x106 → wrong board, PSRAM, or camera settings
+- No image → open http://<ip>/capture in a browser
+- Upload issues → check port and try holding BOOT
 
-- Device wakes when **BOOT button is pressed**
-- `/capture` returns a single JPEG image
-- `/stream` provides live video (not used in app)
+Expo
+
+- “Failed to download update” → switch Expo to Tunnel
+- App does not load correctly → make sure `index.tsx` is inside the `app/` folder
 
 ---
 
-## 🚀 Future improvements
+## Notes
 
-- Auto-discover ESP32 on network (no manual IP)
-- Continuous streaming mode
-- On-device buffering / caching
-- Battery optimisation with timed sleep cycles
+- Sleep endpoint: http://<ip>:82/sleep
+- Device wakes when BOOT button is pressed
+- /capture returns a single JPEG image
+- /stream is live video and is not used by the app
