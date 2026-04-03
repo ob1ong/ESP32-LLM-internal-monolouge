@@ -14,6 +14,57 @@ A project with:
 
 ---
 
+## Expo app setup
+
+### 1. Create the Expo app
+
+Open a terminal and run:
+
+npx create-expo-app mobile-app
+cd mobile-app
+
+### 2. Install the required package
+
+npx expo install expo-speech
+
+### 3. Create the app folder and screen file
+
+Inside `mobile-app`, make sure you have this structure:
+
+mobile-app/
+└── app/
+    └── index.tsx
+
+Important:
+
+- Put `index.tsx` inside the `app/` folder
+- Do not leave `index.tsx` in the project root
+- Expo Router expects app screens inside the `app/` folder
+
+If your project does not already contain an `app` folder, create it manually.
+
+### 4. Replace `app/index.tsx` with your app code
+
+Put your Expo app code into:
+
+mobile-app/app/index.tsx
+
+### 5. Install dependencies and start the app
+
+Run:
+
+npm install
+npx expo start
+
+Then:
+
+- Open Expo Go on your phone
+- Scan the QR code
+
+If Expo has connection issues, switch the connection mode to Tunnel.
+
+---
+
 ## Mobile app
 
 The app:
@@ -27,38 +78,6 @@ Expected URLs:
 
 - Photo URL: `http://<esp32-ip>/capture`
 - Sleep URL: `http://<esp32-ip>:82/sleep`
-
----
-
-## Running the mobile app
-
-cd mobile-app
-npm install
-npx expo install expo-speech
-npx expo start
-
-Then:
-
-- Open Expo Go
-- Scan the QR code
-
----
-
-## Expo project structure
-
-Put your main app screen here:
-
-mobile-app/
-└── app/
-    └── index.tsx
-
-Important:
-
-- Put `index.tsx` inside the `app/` folder
-- Do not leave `index.tsx` in the project root
-- Expo Router expects the screen file to be inside `app/`
-
-If you are also using a layout file, it should also go inside the same `app/` folder.
 
 ---
 
@@ -184,8 +203,9 @@ ESP32
 
 Expo
 
-- “Failed to download update” → switch Expo to Tunnel
+- Failed to download update → switch Expo to Tunnel
 - App does not load correctly → make sure `index.tsx` is inside the `app/` folder
+- Expo package issues → run `npm install`
 
 ---
 
